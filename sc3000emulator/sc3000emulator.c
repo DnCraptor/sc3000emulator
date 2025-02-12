@@ -202,7 +202,7 @@ lfs_t lfs;
 lfs_file_t lfs_file,lfs_fd,lfs_cart1,lfs_cart2;
 
 #define FILE_THREHSOLD 20000000
-#define LFS_LS_FILES 12
+#define LFS_LS_FILES 15
 
 volatile uint32_t load_enabled=0;
 volatile uint32_t save_enabled=0;
@@ -856,13 +856,28 @@ int draw_files(int num_selected,int page) {
         cursor_x=20;
         cursor_y=i+3;
         fbcolor=7;
-        video_print("                    ");
+//        video_print("                    ");
+                video_print("  ");
     }
 
     while(1) {
 
         int res= lfs_dir_read(&lfs,&lfs_dirs,&lfs_dir_info);
         if(res<=0) {
+            
+            if(num_entry>=LFS_LS_FILES*(page+1)) {
+                break;
+            }
+
+            if((num_entry%LFS_LS_FILES)!=(LFS_LS_FILES-1)) {
+                for(int i=num_entry%LFS_LS_FILES;i<LFS_LS_FILES;i++) {
+                    cursor_x=22;
+                    cursor_y=i+3;
+                    fbcolor=7;
+                    video_print("                  ");                    
+                }
+            }
+
             break;
         }
 
@@ -891,7 +906,9 @@ int draw_files(int num_selected,int page) {
                         fbcolor=7;
                     }
 
-                    video_print(lfs_dir_info.name);
+                    snprintf(str,16,"%s            ",lfs_dir_info.name);
+                    video_print(str);
+//                    video_print(lfs_dir_info.name);
 
                 }
 
